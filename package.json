@@ -1,9 +1,9 @@
 {
-  "name": "electron-vue-vite",
-  "version": "2.0.0",
+  "name": "handle-xlsx-app",
+  "version": "1.0.0",
   "main": "dist-electron/main/index.js",
-  "description": "Really simple Electron + Vue + Vite boilerplate.",
-  "author": "草鞋没号 <308487730@qq.com>",
+  "description": "Really simple Electron + Vue + Vite boilerplate.,handle xlsx app",
+  "author": "m543438924@163.com",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -35,6 +35,7 @@
     "rollup",
     "vite",
     "vue3",
-    "vue"
+    "vue",
+    "xlsx"
   ]
 }
