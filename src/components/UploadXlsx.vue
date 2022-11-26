@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {  ElMessage } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import { ref } from 'vue';
 import type { UploadUserFile, UploadFile, UploadFiles, UploadProps } from 'element-plus';
 import complain from 'src/utils/xlsx/complain';
@@ -7,6 +7,8 @@ import meridian from 'src/utils/xlsx/meridian';
 import trina from 'src/utils/xlsx/trina';
 import mapping from 'src/utils/xlsx/mapping';
 import main from 'src/utils/xlsx/index';
+import type { IData } from 'src/utils/index';
+
 // 上传文件名称
 const fileNames = ['天合表', '投诉分析表', '映射表', '经分表'];
 // 文件后缀列表
@@ -36,31 +38,44 @@ const handleSubmit = async () => {
     ElMessage.info('请上传全部文件后，再点击生成');
     return;
   }
-  let complainData = {};
-  let meridianData = {};
-  let trinaData = {};
-  let mappingData = {};
+  let complainData: IData = {
+    data: {}
+  };
+  let meridianData: IData = {
+    data: {}
+  };
+  let trinaData: IData = {
+    data: {}
+  };
+  let mappingData: IData = {
+    data: {}
+  };
   for (let file of fileLists.value) {
-    const { name, raw } = file;
+    const { name, raw }: Pick<UploadFile, 'name' | 'raw'> = file;
     if (name.indexOf('投诉分析表') > -1) {
-      complainData = await complain(raw?.path);
+      complainData = await complain(raw?.path as any);
       continue;
     }
     if (name.indexOf('经分表') > -1) {
-      meridianData = await meridian(raw?.path);
+      meridianData = await meridian(raw?.path as any);
       continue;
     }
     if (name.indexOf('天合表') > -1) {
-      trinaData = await trina(raw?.path);
+      trinaData = await trina(raw?.path as any);
       continue;
     }
     if (name.indexOf('映射表') > -1) {
-      mappingData = await mapping(raw?.path);
+      mappingData = await mapping(raw?.path as any);
       continue;
     }
   }
-  
-  await main({ complain: complainData, meridian: meridianData, trina: trinaData, mapping: mappingData });
+
+  await main({
+    complain: complainData,
+    meridian: meridianData,
+    trina: trinaData,
+    mapping: mappingData
+  });
 };
 </script>
 
