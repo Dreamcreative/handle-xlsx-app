@@ -1,6 +1,9 @@
-const path = require('path');
-const fs = require('fs');
-
+import path from 'path';
+import fs from 'fs';
+export interface IData {
+  data: object;
+}
+export type environmentType = 'windows' | 'mac';
 export default {
   inputDir: 'input',
   outputDir: 'output',
@@ -64,7 +67,7 @@ export default {
 
   totalSpilt: '_',
   complaintNumberDefault: '-',
-  deleteFolderRecursive: function deleteFolderRecursive(url) {
+  deleteFolderRecursive: function deleteFolderRecursive(url: string): void {
     var files = [];
     /**
      * 判断给定的路径是否存在
@@ -74,7 +77,7 @@ export default {
        * 返回文件和子目录的数组
        */
       files = fs.readdirSync(url);
-      files.forEach(function (file, index) {
+      files.forEach(function (file) {
         var curPath = path.join(url, file);
         /**
          * fs.statSync同步读取文件夹文件，如果是文件夹，在重复触发函数
@@ -95,16 +98,17 @@ export default {
     }
   },
   // 将英文括号转为中午括号
-  replaceEnglishBracketsToChiniese: function (name) {
-    const reg = /(（|）)/gi;
-    if (!name) return;
+  replaceEnglishBracketsToChiniese: function (name: string): string {
+    const reg: RegExp = /(（|）)/gi;
+    if (!name) return '';
+    // @ts-ignore
     name = name.replace(reg, match => {
       if (match === '（') return '(';
       if (match === '）') return ')';
     });
     return name;
   },
-  environment: () => {
+  environment: (): environmentType => {
     var agent = navigator.userAgent.toLowerCase();
     var isMac = /macintosh|mac os x/i.test(navigator.userAgent);
     if (agent.indexOf('win32') >= 0 || agent.indexOf('wow32') >= 0) {
@@ -116,5 +120,6 @@ export default {
     if (isMac) {
       return 'mac';
     }
+    return 'windows';
   }
 };

@@ -2,6 +2,21 @@
 
 import xlsx from 'node-xlsx';
 import utils from 'src/utils/index';
+import type { IData } from 'src/utils/index';
+export type indexMapType = {
+  [key in string]: any;
+};
+export type DataType = {
+  [key in string]: any;
+};
+export type tempType = {
+  [key in string]: any;
+};
+export type meridianDataType = any;
+export type meridianType<T> = {
+  data: Array<T>;
+  name: string;
+};
 const {
   inputDir,
   outputDir,
@@ -17,18 +32,19 @@ const {
   meridiankey8,
   replaceEnglishBracketsToChiniese
 } = utils;
-export default async path => {
-  const data = {};
-  const indexMap = {};
-  const temp = {};
+
+export default async (path: string): Promise<IData> => {
+  const data: DataType = {};
+  const indexMap: indexMapType = {};
+  const temp: tempType = {};
 
   console.log('正在读取...', meridianName);
-  const meridian = xlsx.parse(path)[0];
-  const meridianData = meridian.data || [];
+  const meridian: meridianType<meridianDataType> = xlsx.parse(path)[0];
+  const meridianData: meridianDataType[] = meridian.data || [];
 
   console.log('正在处理...', meridianName);
   const firstItem = meridianData.shift();
-  firstItem.forEach((name, index) => {
+  firstItem.forEach((name: string, index: number) => {
     indexMap[name] = index;
   });
   meridianData.forEach(item => {
@@ -45,7 +61,7 @@ export default async path => {
     let name = item0[indexMap[meridiankey8]] || '';
     let isAI = false;
     let isNationalVoice = false;
-    const result = item.reduce((total, cur) => {
+    const result = item.reduce((total: number, cur: tempType) => {
       if (!isAI && cur[indexMap[meridiankey2]]?.indexOf(meridiankey6) > -1) {
         isAI = true;
       }

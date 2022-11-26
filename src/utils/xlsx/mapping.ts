@@ -1,6 +1,18 @@
 // 映射表
 import xlsx from 'node-xlsx';
 import utils from 'src/utils/index';
+import type { IData } from 'src/utils/index';
+export type mappingDataType = any;
+export type mappingType<T> = {
+  data: Array<T>;
+  name: string;
+};
+export type DataType = {
+  [key in string]: any;
+};
+export type indexMapType = {
+  [key in string]: any;
+};
 const {
   mappingName,
 
@@ -10,17 +22,17 @@ const {
   mappingkey4,
   replaceEnglishBracketsToChiniese
 } = utils;
-export default async path => {
-  const data = {};
-  const indexMap = {};
+export default async (path: string): Promise<IData> => {
+  const data: mappingDataType = {};
+  const indexMap: indexMapType = {};
   console.log('正在读取...', mappingName);
-  const mapping = await xlsx.parse(path)[0];
-  const mappingData = mapping.data || [];
+  const mapping: mappingType<mappingDataType> = await xlsx.parse(path)[0];
+  const mappingData: mappingDataType[] = mapping.data || [];
 
   console.log('正在处理...', mappingName);
   mappingData.forEach((item, index) => {
     if (index === 0) {
-      item.forEach((name, index) => {
+      item.forEach((name: string, index: number) => {
         indexMap[name] = index;
       });
     }

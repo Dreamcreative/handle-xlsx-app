@@ -2,6 +2,18 @@
 
 import xlsx from 'node-xlsx';
 import utils from 'src/utils/index';
+import type { IData } from 'src/utils/index';
+export type trinaDataType = any;
+export type trinaType<T> = {
+  data: Array<T>;
+  name: string;
+};
+export type DataType = {
+  [key in string]: any;
+};
+export type indexMapType = {
+  [key in string]: any;
+};
 const {
   trinaName,
 
@@ -11,18 +23,19 @@ const {
   trinakey4,
   replaceEnglishBracketsToChiniese
 } = utils;
-export default async path => {
-  const data = {};
-  const indexMap = {};
+
+export default async (path: string): Promise<IData> => {
+  const data: DataType = {};
+  const indexMap: indexMapType = {};
 
   console.log('正在读取...', trinaName);
-  const trina = xlsx.parse(path)[0];
-  const trinaData = trina.data || [];
+  const trina: trinaType<trinaDataType> = xlsx.parse(path)[0];
+  const trinaData: trinaDataType[] = trina.data;
 
   console.log('正在处理...', trinaName);
-  trinaData.forEach((item, index) => {
+  trinaData.forEach((item: trinaDataType, index: number) => {
     if (index === 0) {
-      item.forEach((name, index) => {
+      item.forEach((name: string, index: number) => {
         indexMap[name] = index;
       });
     }

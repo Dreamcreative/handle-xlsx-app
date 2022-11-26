@@ -1,20 +1,31 @@
 // 投诉分析表
 import xlsx from 'node-xlsx';
 import utils from 'src/utils/index';
+import type { IData } from 'src/utils/index';
 const { complaintName, complaintkey1, complaintkey2, complaintkey3 } = utils;
-
-export default async function handleComplaint(path) {
-  const data = {};
-  const indexMap = {};
+export type DataType = {
+  [key in string]: any;
+};
+export type indexMapType = {
+  [key in string]: any;
+};
+export type complainDataType = any;
+export type complainType<T> = {
+  data: Array<T>;
+  name?: string;
+};
+export default async function handleComplaint(path: string): Promise<IData> {
+  const data: DataType = {};
+  const indexMap: indexMapType = {};
 
   console.log('正在读取...', complaintName);
-  const complaint = await xlsx.parse(path)[0];
-  const complaintData = complaint.data || [];
+  const complaint: complainType<complainDataType> = await xlsx.parse(path)[0];
+  const complaintData: complainDataType[] = complaint.data || [];
 
   console.log('正在处理...', complaintName);
   complaintData.forEach((item, index) => {
     if (index === 0) {
-      item.forEach((name, index) => {
+      item.forEach((name: string, index: number) => {
         indexMap[name] = index;
       });
     }
