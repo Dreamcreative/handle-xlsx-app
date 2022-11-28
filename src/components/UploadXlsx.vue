@@ -33,6 +33,17 @@ const handleChange: UploadProps['onChange'] = (files: UploadFile, uploadFiles: U
 const handleExceed = () => {
   ElMessage.info('最多只能上传4个文件');
 };
+const handleRemove: UploadProps['onRemove'] = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
+  const uniqueUpload = [];
+  const fileSet = new Set<string>();
+  for (let file of uploadFiles) {
+    uniqueUpload.push(file);
+    fileSet.add(file.name);
+  }
+  fileCompleteNames.value = [...fileSet];
+  fileLists.value = [...uniqueUpload];
+
+};
 const handleSubmit = async () => {
   if (fileLists.value?.length !== 4) {
     ElMessage.info('请上传全部文件后，再点击生成');
@@ -87,17 +98,9 @@ const handleSubmit = async () => {
         <el-tag :type="(fileCompleteNames + '').indexOf(item) > -1 ? 'success' : 'danger'">{{ item }}</el-tag>
       </div>
     </el-space>
-    <el-upload
-      class="upload"
-      v-model:file-list="fileLists"
-      multiple
-      drag
+    <el-upload class="upload" v-model:file-list="fileLists" multiple drag
       accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-      :auto-upload="false"
-      :limit="4"
-      :on-change="handleChange"
-      :on-exceed="handleExceed"
-    >
+      :auto-upload="false" :limit="4" :on-change="handleChange" :on-exceed="handleExceed" :on-remove="handleRemove">
       <el-button type="primary">点击上传</el-button>
       <template #tip>
         <div class="el-upload__tip">请上传 XLSX 格式文件</div>
@@ -111,6 +114,7 @@ const handleSubmit = async () => {
 .uploadxlsx {
   height: 100%;
 }
+
 .upload {
   padding: 20px 0;
 }
