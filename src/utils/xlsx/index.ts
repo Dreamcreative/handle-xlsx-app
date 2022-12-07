@@ -112,6 +112,6 @@ export default async ({ complain, meridian, trina, mapping }: IndexProps) => {
     result.push(item);
   }
   const buffer = xlsx.build([{ name: '汇总表', data: result, options: {} }]);
-  fs.writeFileSync(`${cwd()}/汇总表${moment().format('YYYY-MM-DD')}.xlsx`, buffer);
+  fs.writeFileSync(`${process.env.DOWNLOAD_DIR}/汇总表${moment().format('YYYY-MM-DD')}.xlsx`, buffer);
   console.log(1111, '已生成');
 };
