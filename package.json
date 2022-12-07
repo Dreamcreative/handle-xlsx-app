@@ -8,7 +8,9 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build && electron-builder"
+    "build": "vue-tsc --noEmit && vite build && electron-builder",
+    "build-mac": "vue-tsc --noEmit && vite build && electron-builder -m",
+    "build-win": "vue-tsc --noEmit && vite build && electron-builder -w"
   },
   "engines": {
     "node": "^14.18.0 || >=16.0.0"
