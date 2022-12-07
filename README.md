@@ -1,71 +1,60 @@
-# electron-vite-vue
+# 将多个 xlsx 的数据通过一定的对应关系，将数据最终汇总到一个表中，生成 xlsx 文件
 
-🥳 Really simple `Electron` + `Vue` + `Vite` boilerplate.
+[handle-xlsx](https://github.com/Dreamcreative/handle-xlsx/blob/master/README.md)
 
-<!-- [![awesome-vite](https://awesome.re/mentioned-badge.svg)](https://github.com/vitejs/awesome-vite) -->
-<!-- [![Netlify Status](https://api.netlify.com/api/v1/badges/ae3863e3-1aec-4eb1-8f9f-1890af56929d/deploy-status)](https://app.netlify.com/sites/electron-vite/deploys) -->
-<!-- [![GitHub license](https://img.shields.io/github/license/caoxiemeihao/electron-vite-vue)](https://github.com/electron-vite/electron-vite-vue/blob/main/LICENSE) -->
-<!-- [![GitHub stars](https://img.shields.io/github/stars/caoxiemeihao/electron-vite-vue?color=fa6470)](https://github.com/electron-vite/electron-vite-vue) -->
-<!-- [![GitHub forks](https://img.shields.io/github/forks/caoxiemeihao/electron-vite-vue)](https://github.com/electron-vite/electron-vite-vue) -->
-[![GitHub Build](https://github.com/electron-vite/electron-vite-vue/actions/workflows/build.yml/badge.svg)](https://github.com/electron-vite/electron-vite-vue/actions/workflows/build.yml)
-[![GitHub Discord](https://img.shields.io/badge/chat-discord-blue?logo=discord)](https://discord.gg/sRqjYpEAUK)
+## 取数逻辑
 
-## Features
+1. 经分表
+   根据 e55 拿到 当日优惠后消费金额 ， 且 产品名称 为 ‘全国语音’ 。取 当日优惠后消费金额 的和(一天一条数据) ，填入汇总表的 出账收入
+   当日优惠后消费金额=》出账收入
 
-📦 Out of the box  
-🎯 Based on the official [template-vue-ts](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-vue-ts), less invasive  
-🌱 Extensible, really simple directory structure  
-💪 Support using Node.js API in Electron-Renderer  
-🔩 Support C/C++ native addons  
-🖥 It's easy to implement multiple windows  
+2. 天合表 （最大值，平均值 人为处理好）：根据 目标客户名称 在 映射表中 取到 e55 的值 ，
+   天合表的 分配号码数=》码号数量
+   天合表的 平台配置并发数=》账户并发
+   天合表的 峰值=》平均峰值并发
 
-## Quick Start
+3. 投诉分析表
+   备注 对应 投诉编号
+   投诉总量=》 投诉总量
+   违规催收=》催收投诉总量
 
-```sh
-npm create electron-vite
-```
+## input 文件夹下，文件提前处理方式
 
-<!-- [![quick-start](https://asciinema.org/a/483731.svg)](https://asciinema.org/a/483731) -->
+- 汇总表：提前准备好，需要填写字段的空表
 
-![electron-vite-vue.gif](https://github.com/electron-vite/electron-vite-vue/blob/main/public/electron-vite-vue.gif?raw=true)
+* 经分表：需要处理数据的表
+* 天合表：已经提前处理好的 分配号码数(最大值) 平台配置并发数(最大值) 峰值(平均值)，并且表头值必须是 分配号码数、平台配置并发数、峰值
+* 投诉分析表：1. 将其他无关数据删除，2. 第一行表头删除
+* 映射表：准备好 e55 映射关系数据
 
-## Debug
+1. 汇总表
 
-![electron-vite-react-debug.gif](https://github.com/electron-vite/electron-vite-react/blob/main/public/electron-vite-react-debug.gif?raw=true)
+   | 地市 | 集团名称 | `e55计费号` | 投诉编号 | 出账收入 | 码号数量 | 账户并发 | 平均峰值并发 | 投诉总量 | 催收投诉总量 | 非催收投诉总量 | `ARPU值 ` | 收入/并发 | 收入/非催收投诉 | `是否AI` |
+   | ---- | -------- | ----------- | -------- | -------- | -------- | -------- | ------------ | -------- | ------------ | -------------- | --------- | --------- | --------------- | -------- |
+   | 地市 | 集团名称 | e55 计费号  | 投诉编号 | -        | -        | -        | -            | -        | -            | -              | -         | -         | -               | -        |
 
-## Directory
+2. 经分表
 
-```diff
-+ ├─┬ electron
-+ │ ├─┬ main
-+ │ │ └── index.ts    entry of Electron-Main
-+ │ └─┬ preload
-+ │   └── index.ts    entry of Preload-Scripts
-  ├─┬ src
-  │ └── main.ts       entry of Electron-Renderer
-  ├── index.html
-  ├── package.json
-  └── vite.config.ts
-```
+| 日期     | 地市 | 集团名称            | `e55计费号` | 产品名称       | 当日优惠后消费金额 |
+| -------- | ---- | ------------------- | ----------- | -------------- | ------------------ |
+| 20210926 | 杭州 | 重庆 xxxxxxxxxxxxxx | xxxxxxx     | 全国语音（6s） | 0                  |
 
-## Be aware
+3. 天合表
 
-🚨 By default, this template integrates Node.js in the Renderer process. If you don't need it, you just remove the option below. [Because it will modify the default config of Vite](https://github.com/electron-vite/vite-plugin-electron/tree/main/packages/electron-renderer#config-presets-opinionated).
+> 已经提前处理好的 分配号码数(最大值) 平台配置并发数(最大值) 峰值(平均值)
 
-```diff
-# vite.config.ts
+| 目标客户名称 | 分配号码数 | 平台配置并发数 | 峰值 |
+| ------------ | ---------- | -------------- | ---- |
+| DID 测试 1   | 0          | 0              | 0    |
 
-export default {
-  plugins: [
--   // Use Node.js API in the Renderer-process
--   renderer({
--     nodeIntegration: true,
--   }),
-  ],
-}
-```
+4. 投诉分析表
 
-## FAQ
+| 集团名称  | 备注 | 投诉总量 | 违规催收 |
+| --------- | ---- | -------- | -------- |
+| 北京 xxxx | xxx  | 0        | 0        |
 
-- [dependencies vs devDependencies](https://github.com/electron-vite/vite-plugin-electron-renderer#dependencies-vs-devdependencies)
-- [C/C++ addons, Node.js modules - Pre-Bundling](https://github.com/electron-vite/vite-plugin-electron-renderer#dependency-pre-bundling)
+5. 映射表
+
+| 地市 | 集团名称   | `e55计费号` | 投诉编号 | 天合表名称 | 投诉分析表名称 |
+| ---- | ---------- | ----------- | -------- | ---------- | -------------- |
+| zxx  | DID 测试 1 | xxxxxxxx    | xxxxxx   | xxxx       | xxxxx          |
