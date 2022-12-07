@@ -2,8 +2,8 @@ import xlsx from 'node-xlsx';
 import utils from 'src/utils/index';
 import fs from 'fs';
 import moment from 'moment';
-import { cwd } from 'process';
 import type { IData } from 'src/utils/index';
+import { ElMessage } from 'element-plus';
 export type IndexDataType = any;
 export type IndexType<T> = {
   data: Array<T>;
@@ -112,6 +112,7 @@ export default async ({ complain, meridian, trina, mapping }: IndexProps) => {
     result.push(item);
   }
   const buffer = xlsx.build([{ name: '汇总表', data: result, options: {} }]);
-  fs.writeFileSync(`${process.env.DOWNLOAD_DIR}/汇总表${moment().format('YYYY-MM-DD')}.xlsx`, buffer);
-  console.log(1111, '已生成');
+  const downloadDir = `${process.env.DOWNLOAD_DIR}/汇总表${moment().format('YYYY-MM-DD')}.xlsx`;
+  fs.writeFileSync(downloadDir, buffer);
+  ElMessage.success(`已生成，生成地址 \n ${downloadDir}`);
 };

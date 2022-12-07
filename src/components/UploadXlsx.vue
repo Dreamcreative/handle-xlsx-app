@@ -42,7 +42,6 @@ const handleRemove: UploadProps['onRemove'] = (uploadFile: UploadFile, uploadFil
   }
   fileCompleteNames.value = [...fileSet];
   fileLists.value = [...uniqueUpload];
-
 };
 const handleSubmit = async () => {
   if (fileLists.value?.length !== 4) {
@@ -64,29 +63,48 @@ const handleSubmit = async () => {
   for (let file of fileLists.value) {
     const { name, raw }: Pick<UploadFile, 'name' | 'raw'> = file;
     if (name.indexOf('投诉分析表') > -1) {
-      complainData = await complain(raw?.path as any);
+      try {
+        complainData = await complain(raw?.path as any);
+      } catch (e) {
+        ElMessage.error('投诉分析表错误，请检查');
+      }
       continue;
     }
     if (name.indexOf('经分表') > -1) {
-      meridianData = await meridian(raw?.path as any);
+      try {
+        meridianData = await meridian(raw?.path as any);
+      } catch (e) {
+        ElMessage.error('经分表错误，请检查');
+      }
       continue;
     }
     if (name.indexOf('天合表') > -1) {
-      trinaData = await trina(raw?.path as any);
+      try {
+        trinaData = await trina(raw?.path as any);
+      } catch (e) {
+        ElMessage.error('天合表错误，请检查');
+      }
       continue;
     }
     if (name.indexOf('映射表') > -1) {
-      mappingData = await mapping(raw?.path as any);
+      try {
+        mappingData = await mapping(raw?.path as any);
+      } catch (e) {
+        ElMessage.error('映射表错误，请检查');
+      }
       continue;
     }
   }
-
-  await main({
-    complain: complainData,
-    meridian: meridianData,
-    trina: trinaData,
-    mapping: mappingData
-  });
+  try {
+    await main({
+      complain: complainData,
+      meridian: meridianData,
+      trina: trinaData,
+      mapping: mappingData
+    });
+  } catch (e) {
+    ElMessage.error('生成汇总表错误，请联系 135xxxx6035');
+  }
 };
 </script>
 
@@ -98,9 +116,18 @@ const handleSubmit = async () => {
         <el-tag :type="(fileCompleteNames + '').indexOf(item) > -1 ? 'success' : 'danger'">{{ item }}</el-tag>
       </div>
     </el-space>
-    <el-upload class="upload" v-model:file-list="fileLists" multiple drag
+    <el-upload
+      class="upload"
+      v-model:file-list="fileLists"
+      multiple
+      drag
       accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-      :auto-upload="false" :limit="4" :on-change="handleChange" :on-exceed="handleExceed" :on-remove="handleRemove">
+      :auto-upload="false"
+      :limit="4"
+      :on-change="handleChange"
+      :on-exceed="handleExceed"
+      :on-remove="handleRemove"
+    >
       <el-button type="primary">点击上传</el-button>
       <template #tip>
         <div class="el-upload__tip">请上传 XLSX 格式文件</div>
